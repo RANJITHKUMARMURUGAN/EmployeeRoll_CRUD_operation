@@ -1,11 +1,11 @@
 package com.springboot.repository;
 
+import java.util.Optional;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import com.springboot.model.Employee;
+import com.springboot.model.EmployeePayrollData;
 
-//Spring Data JPA internally provides @Repository Annotation so we no need to add @Repository annotation to EmployeeRepository interface
-
-public interface EmployeeRepository extends JpaRepository<Employee, Long> {
-
+public interface EmployeePayrollRepository extends JpaRepository<EmployeePayrollData, Long> {
+	public Optional<EmployeePayrollData> findById(int id);
 }

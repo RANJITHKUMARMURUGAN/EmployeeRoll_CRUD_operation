@@ -1,9 +1,13 @@
 package com.springboot.controller;
 
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -11,50 +15,46 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.springboot.model.Employee;
-import com.springboot.services.EmployeeService;
-import java.util.*;
-@RestController
-@RequestMapping("/api/employees")
-public class EmployeeController {
-	
-	private EmployeeService employeeService;
+import com.springboot.dto.EmployeePayrollDTO;
+import com.springboot.dto.ResponseDTO;
+import com.springboot.exception.NotFoundException;
+import com.springboot.model.EmployeePayrollData;
+import com.springboot.services.IEmployeePayrollService;
 
-	public EmployeeController(EmployeeService employeeService) {
-		super();
-		this.employeeService = employeeService;
+@RestController
+@CrossOrigin
+@RequestMapping("/api/employees")
+public class EmployeePayrollController {
+	@Autowired
+	private IEmployeePayrollService employeePayrollService;
+
+	@RequestMapping(value = { "/get" })
+	public ResponseEntity<ResponseDTO> getEmployeePayrollData() {
+		List<EmployeePayrollData> employeeList = employeePayrollService.getEmployeePayrollData();
+		ResponseDTO responseDTO = new ResponseDTO("Fetched all Employee Payroll Details", employeeList);
+		return new ResponseEntity<>(responseDTO, HttpStatus.OK);
 	}
-	
-	//build create employee REST API
-	@PostMapping
-	public ResponseEntity<Employee> saveEmployee(@RequestBody Employee employee){
-		return new ResponseEntity<Employee>(employeeService.saveEmployee(employee), HttpStatus.CREATED);
+
+	@PostMapping("/create")
+	public ResponseEntity<ResponseDTO> addEmployeePayrollData(@Valid @RequestBody EmployeePayrollDTO employeePayrollDTO,
+			BindingResult e) {
+		EmployeePayrollDTO addData = employeePayrollService.createEmployeePayrollData(employeePayrollDTO);
+		ResponseDTO responseDTO = new ResponseDTO("Added Employee Payroll Details", addData);
+		return new ResponseEntity<>(responseDTO, HttpStatus.OK);
 	}
-	
-	//build to get All Employee from RestAPI
-	@GetMapping
-	public List<Employee> getAllEmployee(){
-		return employeeService.getAllEmployee();
+
+	@PutMapping("/update/{empID}")
+	public ResponseEntity<ResponseDTO> updateEmployeePayrollData(@PathVariable int empID,
+			@Valid @RequestBody EmployeePayrollDTO employeePayrollDTO) throws NotFoundException {
+		EmployeePayrollDTO updatedData = employeePayrollService.updateEmployeePayrollData(empID, employeePayrollDTO);
+		ResponseDTO responseDTO = new ResponseDTO("Updated by ID : Employee Payroll Details", updatedData);
+		return new ResponseEntity<>(responseDTO, HttpStatus.OK);
 	}
-	
-	//Build get Employee by id Rest API
-	//http://localhost:8080/api/employee/1    like that
-	@GetMapping("{id}")
-	public  ResponseEntity<Employee> getEmployeeById(@PathVariable("id") long employeeId){
-		return new ResponseEntity<Employee>(employeeService.getEmployeeById(employeeId), HttpStatus.OK);
-	}
-	
-	//build a Update employee to Rest API//
-	//http://localhost:8080/api/employee/1
-	@PutMapping("{id}")
-	public ResponseEntity<Employee> updateEmployee(@PathVariable("id") long id,@RequestBody Employee employee){
-		return new ResponseEntity<Employee>(employeeService.updateEmployee(employee, id),HttpStatus.OK);
-	}
-	
-	//build a Delete employee Rest API//
-	@DeleteMapping("{id}")
-	public ResponseEntity<String>deleteEmployee(@PathVariable("id") long id){
-		employeeService.deleteEmployee(id);
-		return new ResponseEntity<String>("Employee deleted Successfully..!", HttpStatus.OK);
+
+	@DeleteMapping("/delete/{id}")
+	public ResponseEntity<ResponseDTO> deleteEmployeeDetails(@PathVariable(name = "id") int id) {
+		employeePayrollService.deleteEmployeePayrollData(id);
+		ResponseDTO responseDTO = new ResponseDTO("Deleted by ID : Employee Payroll Details", null);
+		return new ResponseEntity<>(responseDTO, HttpStatus.OK);
 	}
 }
