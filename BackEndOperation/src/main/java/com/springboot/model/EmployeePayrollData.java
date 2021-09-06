@@ -26,7 +26,6 @@ public class EmployeePayrollData {
 	private String name;
 	private String gender;
 	private String salary;
-	private String email;
 
 	@Convert(converter = ListToJSONConvertor.class)
 	private List<String> department;

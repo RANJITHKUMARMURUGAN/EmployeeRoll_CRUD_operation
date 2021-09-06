@@ -14,9 +14,6 @@ public class EmployeePayrollDTO {
 	@Min(value = 1000, message = "Min salary should be more than 1000")
 	private String salary;
 
-	@Pattern(regexp = "^[A-Z0-9+_.-]+@[A-Z0-9.-]+$", message = "Employee email id is  Invalid")
-	private String email;
-
 	private List<String> department;
 
 	private String profilePic;
